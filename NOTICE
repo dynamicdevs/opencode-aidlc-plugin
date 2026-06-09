@@ -1,0 +1,14 @@
+opencode-aidlc
+Copyright (c) 2026 Jonathan González — Dynamic Devs (https://www.dynamicdevs.io)
+
+This package redistributes, under the `rules/` directory, the AI-DLC rule
+bundle from the awslabs/aidlc-workflows project as an offline fallback:
+
+  awslabs/aidlc-workflows
+  https://github.com/awslabs/aidlc-workflows
+  Licensed under the MIT-0 License.
+
+The vendored rule files (rules/aws-aidlc-rules/ and rules/aws-aidlc-rule-details/)
+are unmodified copies pinned to release v0.1.8. At install time, `opencode-aidlc
+setup` prefers downloading the latest release directly from the upstream project
+and only uses this vendored copy when the download is unavailable.

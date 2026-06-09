@@ -1,0 +1,49 @@
+{
+  "name": "opencode-aidlc",
+  "version": "0.1.0",
+  "description": "OpenCode plugin that adds AWS AI-DLC slash commands and installs the awslabs AI-DLC rule bundle",
+  "author": "Jonathan González <jgonzalez@dynamicdevs.io> (https://www.dynamicdevs.io)",
+  "homepage": "https://github.com/dynamicdevs/opencode-aidlc-plugin#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dynamicdevs/opencode-aidlc-plugin.git"
+  },
+  "bugs": {
+    "url": "https://github.com/dynamicdevs/opencode-aidlc-plugin/issues"
+  },
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "main": "src/index.js",
+  "bin": {
+    "opencode-aidlc": "bin/setup.js"
+  },
+  "files": [
+    "src/",
+    "commands/",
+    "rules/",
+    "bin/",
+    "README.md",
+    "LICENSE",
+    "NOTICE"
+  ],
+  "scripts": {
+    "build": "node scripts/build-commands.js",
+    "vendor:rules": "node scripts/vendor-rules.js",
+    "prepublishOnly": "node scripts/build-commands.js && node -e \"require('fs').accessSync('rules/aws-aidlc-rules')\""
+  },
+  "keywords": [
+    "opencode",
+    "opencode-plugin",
+    "aidlc",
+    "ai-dlc",
+    "aws"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "fflate": "^0.8.2"
+  }
+}
