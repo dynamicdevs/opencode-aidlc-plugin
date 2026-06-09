@@ -1,6 +1,6 @@
 {
   "name": "opencode-aidlc",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "OpenCode plugin that adds AWS AI-DLC slash commands and installs the awslabs AI-DLC rule bundle",
   "author": "Jonathan González <jgonzalez@dynamicdevs.io> (https://www.dynamicdevs.io)",
   "homepage": "https://github.com/dynamicdevs/opencode-aidlc-plugin#readme",
@@ -25,6 +25,7 @@
     "rules/",
     "bin/",
     "README.md",
+    "CHANGELOG.md",
     "LICENSE",
     "NOTICE"
   ],

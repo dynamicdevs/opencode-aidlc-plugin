@@ -56,13 +56,18 @@ This will:
    not already exist** — it never overwrites rules you have customized. The
    latest release is downloaded from awslabs/aidlc-workflows; if you are offline,
    a copy vendored in this package is used instead.
-3. Register `opencode-aidlc` in your `opencode.json` `plugin` array.
+3. Register `opencode-aidlc` in your `opencode.json` `plugin` array. The config
+   location is auto-detected: if an `opencode.json`/`opencode.jsonc` already exists
+   in the project root or in `.opencode/`, that file is updated; otherwise it
+   defaults to the project root (`./opencode.json`).
 
 ### Options
 
 ```bash
 npx opencode-aidlc setup --global       # install commands in ~/.config/opencode/commands
 npx opencode-aidlc setup --force        # overwrite existing command files
+npx opencode-aidlc setup --nested       # register the plugin in .opencode/opencode.json
+npx opencode-aidlc setup --root         # register the plugin in ./opencode.json (default)
 npx opencode-aidlc setup --no-register  # don't modify opencode.json
 ```
 
@@ -92,8 +97,9 @@ rules, delete that folder first and re-run `setup`.
 ## How it relates to OpenCode plugins
 
 This is a regular OpenCode plugin (it exposes a plugin entry in
-`opencode.json`'s `plugin` array), but it has no runtime hooks today — the entry
-is a no-op placeholder. All behavior is delivered through the slash commands and
+`opencode.json`'s `plugin` array — either `./opencode.json` or
+`.opencode/opencode.json`, both of which OpenCode loads), but it has no runtime
+hooks today — the entry is a no-op placeholder. All behavior is delivered through the slash commands and
 the rule bundle installed by `setup`.
 
 ## Maintainer notes

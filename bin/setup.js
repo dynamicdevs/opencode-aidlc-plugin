@@ -12,11 +12,17 @@
  *      ONLY if it does not already exist. Tries the latest GitHub release first,
  *      and falls back to the copy vendored in this package when offline.
  *   3. Registers this package in `opencode.json`'s `plugin` array (best effort).
+ *      The config is auto-detected: if an `opencode.json`/`opencode.jsonc` already
+ *      exists in the project root or in `.opencode/`, that file is updated;
+ *      otherwise it defaults to the project root. Force a location with
+ *      `--root` / `--nested`.
  *
  * Usage:
  *   npx opencode-aidlc setup            # project: .opencode/commands + ./.aidlc
  *   npx opencode-aidlc setup --global   # commands in ~/.config/opencode
  *   npx opencode-aidlc setup --force    # overwrite existing command files
+ *   npx opencode-aidlc setup --nested   # register in .opencode/opencode.json
+ *   npx opencode-aidlc setup --root     # register in ./opencode.json (default)
  *   npx opencode-aidlc setup --no-register   # don't touch opencode.json
  */
 
@@ -37,11 +43,13 @@ const PKG_ROOT = path.join(__dirname, "..");
 
 // --- CLI args ----------------------------------------------------------------
 function parseArgs(argv) {
-  const opts = { global: false, force: false, register: true };
+  const opts = { global: false, force: false, register: true, configLocation: "auto" };
   for (const a of argv) {
     if (a === "--global") opts.global = true;
     else if (a === "--force") opts.force = true;
     else if (a === "--no-register") opts.register = false;
+    else if (a === "--nested") opts.configLocation = "nested";
+    else if (a === "--root") opts.configLocation = "root";
     else if (a === "setup") continue; // tolerate `opencode-aidlc setup`
     else if (a === "-h" || a === "--help") opts.help = true;
     else console.warn(`warn    unknown argument: ${a}`);
@@ -52,10 +60,12 @@ function parseArgs(argv) {
 function printHelp() {
   console.log(
     [
-      "opencode-aidlc setup [--global] [--force] [--no-register]",
+      "opencode-aidlc setup [--global] [--force] [--nested|--root] [--no-register]",
       "",
       "  --global       install commands in ~/.config/opencode/commands",
       "  --force        overwrite existing command files",
+      "  --nested       register the plugin in .opencode/opencode.json",
+      "  --root         register the plugin in ./opencode.json (default)",
       "  --no-register  do not add the plugin to opencode.json",
     ].join("\n")
   );
@@ -115,7 +125,28 @@ async function installRules(rulesDest) {
 }
 
 // --- Step 3: register plugin -------------------------------------------------
+function hasConfig(dir) {
+  return (
+    fs.existsSync(path.join(dir, "opencode.json")) ||
+    fs.existsSync(path.join(dir, "opencode.jsonc"))
+  );
+}
+
+// Decide where the project-level opencode config lives. An explicit --root or
+// --nested wins; otherwise auto-detect an existing config (root takes priority
+// if both exist) and fall back to the project root for a fresh project.
+function resolveProjectConfigDir(cwd, location) {
+  const root = cwd;
+  const nested = path.join(cwd, ".opencode");
+  if (location === "nested") return nested;
+  if (location === "root") return root;
+  if (hasConfig(root)) return root;
+  if (hasConfig(nested)) return nested;
+  return root;
+}
+
 function registerPlugin(configDir) {
+  fs.mkdirSync(configDir, { recursive: true });
   const jsonPath = path.join(configDir, "opencode.json");
   const jsoncPath = path.join(configDir, "opencode.jsonc");
 
@@ -162,7 +193,7 @@ async function main() {
   const rulesDest = path.join(process.cwd(), ".aidlc", "aidlc-rules");
   const configDir = opts.global
     ? path.join(os.homedir(), ".config", "opencode")
-    : process.cwd();
+    : resolveProjectConfigDir(process.cwd(), opts.configLocation);
 
   installCommands(commandsDest, opts.force);
   await installRules(rulesDest);
